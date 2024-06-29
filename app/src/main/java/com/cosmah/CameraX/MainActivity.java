@@ -1,17 +1,25 @@
 package com.cosmah.CameraX;
 
 
+import static androidx.activity.OnBackPressedDispatcherKt.addCallback;
+
 import android.Manifest;
 
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.hardware.camera2.CameraDevice;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -65,7 +73,10 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isCameraInitialized;
 
-    private Camera nCamera = null;
+    private CameraDevice nCamera = null;
+
+    private static SurfaceHolder myHolder;
+
 
 
     @Override
@@ -79,6 +90,36 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (!isCameraInitialized){
+
+        }
+    }
+
+    private static class CameraPreview extends SurfaceView implements SurfaceHolder.Callback{
+        private static SurfaceHolder nHolder;
+        private static CameraDevice nCamera;
+        private CameraPreview(Context context, CameraDevice camera){
+            super(context);
+            nCamera = camera;
+            nHolder = getHolder();
+            nHolder = addCallback(this);
+            nHolder = setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        }
+
+        public void surfaceCreated(SurfaceHolder holder){
+            myHolder = holder;
+            try {
+                nCamera.setPreviewDisplay(holder);
+                nCamera.startPreview();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public void surfaceDestroyed(SurfaceHolder holder){
+
+        }
+
+        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height){
 
         }
     }
